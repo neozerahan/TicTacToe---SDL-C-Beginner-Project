@@ -12,4 +12,8 @@ void ProcessPlayerTurn(WindowInfo gameWindow, gameData *currentGameData, Player 
         CellData *cellData, int cellNum, const unsigned short int currentPlayerNumber, 
         const unsigned short int nextPlayerNumber);
 
+uint8_t CheckCellForWin(Cell *cellCollection, uint8_t rowID, int currentPlayerNumber,
+        uint8_t direction);
+
+uint8_t CheckWin(int selectedCell, Cell *cellCollection, uint8_t currentPlayerNumber);
 #endif

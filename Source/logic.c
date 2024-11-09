@@ -1,4 +1,5 @@
 #include "..\Include\logic.h"
+#include <stdint.h>
 
 int logic(gameData *currentGameData,WindowInfo gameWindow, CellData *cellData)
 {
@@ -58,12 +59,161 @@ void ProcessPlayerTurn(WindowInfo gameWindow, gameData *currentGameData, Player 
     cellData->cellCollection[cellNum].playerNumber = currentPlayerNumber; 
     player->turnCount++;
     currentGameData->currentTurn =  nextPlayerNumber;
+
+    //Only check win condition if more than 2 turns have passed...
+    if(player->turnCount > 2)
+    {
+       if(CheckWin(cellNum, cellData->cellCollection, currentPlayerNumber))
+       {
+            printf("Player %d WINS!\n", currentPlayerNumber);
+       }
+    }
 }
 
-//LOGIC FOR CHECKING WIN CONDITION...
-// --> Make a check function...
-// --> make it work horizontal i.e i+1  (1,2,3)
-// --> make it work vertical i.e i+3    (1,4,7) 
-// --> make it work diagonally i.e i+4  (1,5,9) 
-// --> make an array which checks based on the cell number i.e if 2 then it will check the
-// necessary cells for matching shapes...
+uint8_t CheckWin(int selectedCell, Cell *cellCollection, uint8_t currentPlayerNumber)
+{
+    //CHECK FIRST ROW...
+    if(selectedCell == 0)
+    {
+        if(CheckCellForWin(cellCollection, FIRST_ROW_ID, currentPlayerNumber, DIRECTION_HORIZONTAL))
+            return TRUE;
+
+        if(CheckCellForWin(cellCollection, FIRST_ROW_ID, currentPlayerNumber, DIRECTION_VERTICAL))
+            return TRUE;
+
+        printf("Check FIRST COLUMN - DIAGONAL\n");
+        if(CheckCellForWin(cellCollection, FIRST_ROW_ID, currentPlayerNumber, DIRECTION_DIAGONAL))
+            return TRUE;
+    }
+
+    if(selectedCell == 1)
+    {
+        if(CheckCellForWin(cellCollection, FIRST_ROW_ID, currentPlayerNumber, DIRECTION_HORIZONTAL))
+            return TRUE;
+
+        printf("Check SECOND COLUMN - VERTICAL\n");
+        if(CheckCellForWin(cellCollection, SECOND_COLUMN_ID, currentPlayerNumber, DIRECTION_VERTICAL))
+            return TRUE;
+    }
+
+    if(selectedCell == 2)
+    {
+        printf("Check FIRST ROW - HORIZONTAL\n");
+        if(CheckCellForWin(cellCollection, FIRST_ROW_ID, currentPlayerNumber, DIRECTION_HORIZONTAL))
+            return TRUE;
+
+        printf("Check THIRD COLUMN - VERTICAL\n");
+        if(CheckCellForWin(cellCollection, THIRD_COLUMN_ID, currentPlayerNumber, DIRECTION_VERTICAL))
+            return TRUE;
+
+        printf("Check THIRD COLUMN - REVERSE DIAGONAL\n");
+        if(CheckCellForWin(cellCollection, THIRD_COLUMN_ID, currentPlayerNumber, 
+                    DIRECTION_REVERSE_DIAGONAL))
+            return TRUE;
+    }
+
+    if(selectedCell == 3)
+    {
+        printf("Check SECOND ROW - HORIZONTAL\n");
+        if(CheckCellForWin(cellCollection, SECOND_ROW_ID, currentPlayerNumber, DIRECTION_HORIZONTAL))
+            return TRUE;
+
+        printf("Check FIRST ROW - VERTICAL\n");
+        if(CheckCellForWin(cellCollection, FIRST_ROW_ID, currentPlayerNumber, DIRECTION_VERTICAL))
+            return TRUE;
+    }
+
+    if(selectedCell == 4)
+    {
+        printf("Check SECOND ROW - HORIZONTAL\n");
+        if(CheckCellForWin(cellCollection, SECOND_ROW_ID, currentPlayerNumber, DIRECTION_HORIZONTAL))
+            return TRUE;
+
+        printf("Check SECOND COLUMN - VERTICAL\n");
+        if(CheckCellForWin(cellCollection, SECOND_COLUMN_ID, currentPlayerNumber, DIRECTION_VERTICAL))
+            return TRUE;
+
+        printf("Check THIRD COLUMN - DIAGONAL\n");
+        if(CheckCellForWin(cellCollection, THIRD_COLUMN_ID, currentPlayerNumber, 
+                    DIRECTION_REVERSE_DIAGONAL))
+            return TRUE;
+
+        printf("Check FIRST COLUMN - DIAGONAL\n");
+        if(CheckCellForWin(cellCollection, FIRST_ROW_ID, currentPlayerNumber, DIRECTION_DIAGONAL))
+            return TRUE;
+    }
+
+    if(selectedCell == 5)
+    {
+        printf("Check SECOND ROW - HORIZONTAL\n");
+        if(CheckCellForWin(cellCollection, SECOND_ROW_ID, currentPlayerNumber, DIRECTION_HORIZONTAL))
+            return TRUE;
+
+        printf("Check THIRD COLUMN - VERTICAL\n");
+        if(CheckCellForWin(cellCollection, THIRD_COLUMN_ID, currentPlayerNumber, DIRECTION_VERTICAL))
+            return TRUE;
+    }
+
+    if(selectedCell == 6)
+    {
+        printf("Check FIRST ROW - HORIZONTAL\n");
+        if(CheckCellForWin(cellCollection, FIRST_ROW_ID, currentPlayerNumber, DIRECTION_HORIZONTAL))
+            return TRUE;
+
+        printf("Check THIRD ROW - HORIZONTAL \n");
+        if(CheckCellForWin(cellCollection, THIRD_ROW_ID, currentPlayerNumber, DIRECTION_VERTICAL))
+            return TRUE;
+
+        printf("Check THIRD COLUMN - REVERSE DIAGONAL\n");
+        if(CheckCellForWin(cellCollection, THIRD_COLUMN_ID, currentPlayerNumber, 
+                    DIRECTION_REVERSE_DIAGONAL))
+            return TRUE;
+    }
+
+    if(selectedCell == 7)
+    {
+        printf("Check THIRD ROW - HORIZONTAL\n");
+        if(CheckCellForWin(cellCollection, THIRD_ROW_ID, currentPlayerNumber, DIRECTION_HORIZONTAL))
+            return TRUE;
+
+        printf("Check SECOND COLUMN - VERTICAL\n");
+        if(CheckCellForWin(cellCollection, SECOND_COLUMN_ID, currentPlayerNumber, DIRECTION_VERTICAL))
+            return TRUE;
+    }
+
+    if(selectedCell == 8)
+    {
+        printf("Check  THIRD ROW - HORIZONTAL\n");
+        if(CheckCellForWin(cellCollection, THIRD_ROW_ID, currentPlayerNumber, DIRECTION_HORIZONTAL))
+            return TRUE;
+
+        printf("Check THIRD COLUMN - VERTICAL\n");
+        if(CheckCellForWin(cellCollection, THIRD_COLUMN_ID, currentPlayerNumber, DIRECTION_VERTICAL))
+            return TRUE;
+
+        printf("Check FIRST COLUMN - DIAGONAL\n");
+        if(CheckCellForWin(cellCollection, FIRST_ROW_ID, currentPlayerNumber, DIRECTION_DIAGONAL))
+            return TRUE;
+    }
+    return FALSE;
+}
+
+
+uint8_t CheckCellForWin(Cell *cellCollection, uint8_t rowID, int currentPlayerNumber, 
+        uint8_t direction)
+{
+    const uint8_t NUMBER_OF_CELLS_TO_CHECK = 2; 
+
+    uint8_t maxCellToCheck = rowID + direction * NUMBER_OF_CELLS_TO_CHECK;
+    
+    for(int i = rowID; i < maxCellToCheck; i+=direction)
+    {
+        printf("Processing check for next cell and same cell!\n");
+        if(
+                cellCollection[i + direction].playerNumber != currentPlayerNumber)
+        {
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
