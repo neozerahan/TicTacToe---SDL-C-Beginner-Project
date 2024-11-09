@@ -1,7 +1,6 @@
 #include <stdint.h>
 #include<stdio.h>
 #include <stdlib.h>
-#include "../Include/Glad/glad/glad.h"
 #define SDL_MAIN_HANDLED
 #include "../Include/global.h"
 #include "../Include/windowHandler.h"
