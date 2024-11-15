@@ -38,8 +38,6 @@ int logic(gameData *currentGameData,WindowInfo gameWindow, CellData *cellData)
                  ProcessPlayerTurn(gameWindow, currentGameData, currentGameData->player02, 
                          cellData, cellNum, PLAYER_2_TURN, PLAYER_1_TURN);
             }
-
-            //RenderBoard(gameWindow, *currentGameData,cellCollection);
             result = TRUE;
         }
         else
@@ -65,7 +63,16 @@ void ProcessPlayerTurn(WindowInfo gameWindow, gameData *currentGameData, Player 
     {
        if(CheckWin(cellNum, cellData->cellCollection, currentPlayerNumber))
        {
-            printf("Player %d WINS!\n", currentPlayerNumber);
+           if(currentPlayerNumber == PLAYER_1_TURN)
+           {
+               currentGameData->didWin = PLAYER_1_TURN; 
+           }
+           else
+           {
+               currentGameData->didWin = PLAYER_2_TURN; 
+           }
+
+           printf("Player %d WINS!\n", currentPlayerNumber);
        }
     }
 }
@@ -75,9 +82,11 @@ uint8_t CheckWin(int selectedCell, Cell *cellCollection, uint8_t currentPlayerNu
     //CHECK FIRST ROW...
     if(selectedCell == 0)
     {
+        printf("Check FIRST ROW - DIAGONAL HORIZONTAL\n");
         if(CheckCellForWin(cellCollection, FIRST_ROW_ID, currentPlayerNumber, DIRECTION_HORIZONTAL))
             return TRUE;
 
+        printf("Check FIRST ROW - DIAGONAL VERTICAL\n");
         if(CheckCellForWin(cellCollection, FIRST_ROW_ID, currentPlayerNumber, DIRECTION_VERTICAL))
             return TRUE;
 
@@ -88,6 +97,7 @@ uint8_t CheckWin(int selectedCell, Cell *cellCollection, uint8_t currentPlayerNu
 
     if(selectedCell == 1)
     {
+        printf("Check FIRST ROW - HORIZONTAL\n");
         if(CheckCellForWin(cellCollection, FIRST_ROW_ID, currentPlayerNumber, DIRECTION_HORIZONTAL))
             return TRUE;
 
@@ -156,12 +166,12 @@ uint8_t CheckWin(int selectedCell, Cell *cellCollection, uint8_t currentPlayerNu
 
     if(selectedCell == 6)
     {
-        printf("Check FIRST ROW - HORIZONTAL\n");
-        if(CheckCellForWin(cellCollection, FIRST_ROW_ID, currentPlayerNumber, DIRECTION_HORIZONTAL))
+        printf("Check FIRST ROW - VERTICAL\n");
+        if(CheckCellForWin(cellCollection, FIRST_ROW_ID, currentPlayerNumber, DIRECTION_VERTICAL))
             return TRUE;
 
         printf("Check THIRD ROW - HORIZONTAL \n");
-        if(CheckCellForWin(cellCollection, THIRD_ROW_ID, currentPlayerNumber, DIRECTION_VERTICAL))
+        if(CheckCellForWin(cellCollection, THIRD_ROW_ID, currentPlayerNumber, DIRECTION_HORIZONTAL))
             return TRUE;
 
         printf("Check THIRD COLUMN - REVERSE DIAGONAL\n");
@@ -206,11 +216,12 @@ uint8_t CheckCellForWin(Cell *cellCollection, uint8_t rowID, int currentPlayerNu
 
     uint8_t maxCellToCheck = rowID + direction * NUMBER_OF_CELLS_TO_CHECK;
     
-    for(int i = rowID; i < maxCellToCheck; i+=direction)
+    for(int i = rowID; i <= maxCellToCheck; i+=direction)
     {
         printf("Processing check for next cell and same cell!\n");
-        if(
-                cellCollection[i + direction].playerNumber != currentPlayerNumber)
+        printf("Cell Player Number = %d\n", cellCollection[i].playerNumber);
+        printf("current Player Number = %d\n", currentPlayerNumber);
+        if(cellCollection[i].playerNumber != currentPlayerNumber)
         {
             return FALSE;
         }

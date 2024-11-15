@@ -81,7 +81,7 @@ int main()
             {
                 //RENDERING...
                 SDL_RenderClear(gameWindow.mainRenderer);
-                RenderBoard(gameWindow, currentGameData, &cellData, &boardDrawData);
+                RenderScreen(gameWindow, currentGameData, &cellData, &boardDrawData);
                 SDL_RenderPresent(gameWindow.mainRenderer);
             }
         }
@@ -89,7 +89,7 @@ int main()
         //FREE RESOURCE...
         SDL_DestroyTexture(currentGameData.spriteSheet);
         free(cellData.cellCollection);
-
+        TTF_Quit();
         CloseWindow(&gameWindow);
 
         return 0;
@@ -177,6 +177,7 @@ int InitializeGameData(gameData *currentGameData, SDL_Renderer *gameWindowRender
     currentGameData->player01 = player01;
     currentGameData->player02 = player02;
     currentGameData->currentTurn = PLAYER_1_TURN;
+    currentGameData->didWin = FALSE;
 
     if(!LoadSpriteSheetTexture(&currentGameData->spriteSheet, gameWindowRenderer, 
                 "../Resource/PNG/SpriteSheet.png"))

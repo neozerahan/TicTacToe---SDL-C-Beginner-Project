@@ -20,7 +20,7 @@ void DrawBoard(Renderer *boardRenderer, WindowInfo gameWindow, SDL_Texture *spri
 
 void InitializeRect(SDL_Rect *rect, int x, int y, int width, int height);
 
-void RenderBoard(WindowInfo gameWindow, 
+void RenderScreen(WindowInfo gameWindow, 
         gameData currentGameData, CellData *cellData, Renderer *boardRenderer);
 
 void RenderText(gameData currentGameData, SDL_Renderer *textRenderer, SDL_Rect *textRendererRect,

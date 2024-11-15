@@ -24,7 +24,7 @@ void DrawCells(Cell *cellCollection, WindowInfo gameWindow, Renderer boardRender
     }
 }
 
-void RenderBoard(WindowInfo gameWindow, 
+void RenderScreen(WindowInfo gameWindow, 
         gameData currentGameData, CellData *cellData, Renderer *boardRenderer)
 {
     if(currentGameData.spriteSheet == NULL)
@@ -40,13 +40,13 @@ void RenderBoard(WindowInfo gameWindow,
 
     unsigned short cellCount = ROWS * COLUMNS;
 
-
     DrawBoard(boardRenderer, gameWindow, currentGameData.spriteSheet);
 
     DrawCells(cellData->cellCollection, gameWindow, *boardRenderer, currentGameData.spriteSheet);
 
     RenderText(currentGameData, gameWindow.mainRenderer, gameWindow.rect,
             &boardRenderer->rect);
+   
     for(int i = 0; i < cellCount; i++)
     {
         SDL_Rect playerRect = {0};
@@ -64,6 +64,24 @@ void RenderBoard(WindowInfo gameWindow,
                 &playerRect, &cellData->cellCollection[i].rect);
     }
 
+    //Prints the PLAYER VICTORY.
+    //#TODO: Create a function for below...
+    if(currentGameData.didWin > FALSE)
+    {
+        SDL_RenderSetViewport(gameWindow.mainRenderer, gameWindow.rect);
+        Text winText = {0}; 
+        if(currentGameData.didWin == PLAYER_1_TURN)
+        {
+            winText.text = "Player 1 Wins!!!";
+        }
+        else if( currentGameData.didWin == PLAYER_2_TURN)
+        {
+            winText.text = "Player 2 Wins!!!";
+        }
+
+        DrawTitleText(&winText, gameWindow.mainRenderer, currentGameData.font, SCREEN_CENTER,
+               88-25, winText.text,ALLIGN_MID);
+    }
 }
 
 void RenderText(gameData currentGameData, SDL_Renderer *textRenderer, SDL_Rect *textRendererRect,
@@ -74,23 +92,46 @@ void RenderText(gameData currentGameData, SDL_Renderer *textRenderer, SDL_Rect *
     DrawTitleText(&currentGameData.titleText, textRenderer, currentGameData.font, SCREEN_CENTER, 0,
             currentGameData.titleText.text, ALLIGN_MID);
 
-    DrawTitleText(&currentGameData.currentTurnText, textRenderer, currentGameData.font, 
-            SCREEN_WIDTH * 0.5 - 150, 65 , currentGameData.currentTurnText.text, 
-            ALLIGN_LEFT);
+   
+    //Render the CURRENT PLAYER TEXT only if player does not win...
+    if(currentGameData.didWin == FALSE)
+    {
+        DrawTitleText(&currentGameData.currentTurnText, textRenderer, currentGameData.font, 
+                SCREEN_WIDTH * 0.5 - 150, 65 , currentGameData.currentTurnText.text, 
+                ALLIGN_LEFT);
+        if(currentGameData.currentTurn == PLAYER_1_TURN)
+        {
+            currentGameData.turnText.text = "Player 1";    
+        }
+        else
+        {
+            currentGameData.turnText.text = "Player 2";    
+        }
 
-    if(currentGameData.currentTurn == PLAYER_1_TURN)
-    {
-        currentGameData.turnText.text = "Player 1";    
+
+        DrawTitleText(&currentGameData.turnText, textRenderer, currentGameData.font, 
+                currentGameData.currentTurnText.rect.x + 
+                currentGameData.currentTurnText.rect.w + 25 
+                , currentGameData.currentTurnText.rect.y, 
+                currentGameData.turnText.text, ALLIGN_LEFT);
+
+        //Draws player shape besides player turn...
+        //TODO: Make this into a function...
+        SDL_Rect shapeRect = {currentGameData.turnText.rect.x + 
+            currentGameData.turnText.rect.w,currentGameData.turnText.rect.y 
+                ,38,38};
+
+        if(currentGameData.currentTurn == PLAYER_1_TURN)
+        {
+            SDL_RenderCopy(textRenderer, currentGameData.spriteSheet, 
+                    &currentGameData.player01->playerTexRect, &shapeRect); 
+        }
+        else if( currentGameData.currentTurn == PLAYER_2_TURN)
+        {
+            SDL_RenderCopy(textRenderer, currentGameData.spriteSheet, 
+                    &currentGameData.player02->playerTexRect, &shapeRect); 
+        }
     }
-    else
-    {
-        currentGameData.turnText.text = "Player 2";    
-    }
- 
-    DrawTitleText(&currentGameData.turnText, textRenderer, currentGameData.font, 
-            currentGameData.currentTurnText.rect.x + currentGameData.currentTurnText.rect.w + 25 
-            , currentGameData.currentTurnText.rect.y, 
-            currentGameData.turnText.text, ALLIGN_LEFT);
 
     SDL_RenderSetViewport(textRenderer, boardRendererRect);
 }

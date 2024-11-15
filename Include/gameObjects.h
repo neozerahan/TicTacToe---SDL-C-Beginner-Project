@@ -4,6 +4,7 @@
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_pixels.h"
 #include "SDL2/SDL_render.h"
+#include "SDL2/SDL_stdinc.h"
 #include "SDL2/SDL_ttf.h"
 
 
@@ -34,6 +35,7 @@ typedef struct gameData
     Text turnText;
     Text titleText;
     Text currentTurnText;
+    Uint8 didWin;
 }gameData;
 
 typedef struct CellCollisionBox

@@ -47,9 +47,12 @@ void DrawText(Text *text, SDL_Renderer *renderer, TTF_Font *font,unsigned char a
     SDL_FreeSurface(textSurface);
 }
 
+//TODO: Make a seprate function to initialize the font rect so that we don't have to do it
+//everytime we render the font...
 void DrawTitleText(Text *text, SDL_Renderer *renderer, TTF_Font *font, unsigned int x, unsigned int y ,
         char * textInput, unsigned char allign)
 {
+    printf("Drawing Text: %s\n", textInput);
     SDL_Color whiteColor = {255,255,255,255};
     text->color = whiteColor; 
     SDL_Rect textGameTitleRect = {x,y, 1,1};
