@@ -6,13 +6,8 @@ int logic(gameData *currentGameData,WindowInfo gameWindow, CellData *cellData)
     unsigned char result = 0;
     if(currentGameData->canDraw)
     {
-        Sint32 xMouse = 0;
-        Sint32 yMouse = 0;
-
-        xMouse = currentGameData->event.motion.x;
-        yMouse = currentGameData->event.motion.y;
-
-        int cellNum = CheckCellDetection(xMouse, yMouse, cellData); 
+        int cellNum = CheckCellDetection(currentGameData->mousePos.x, 
+                currentGameData->mousePos.y, cellData); 
 
         //if cell number is within the cell count...
         if(cellNum >= 0 & cellNum <= 8)

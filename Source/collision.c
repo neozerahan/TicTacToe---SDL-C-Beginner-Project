@@ -63,3 +63,14 @@ void SetCellDetectionBox(CellData *cellData)
         }
     }
 }
+
+int CheckCollision( CellCollisionBox collisionBox, MousePos mousePos)
+{
+    if(mousePos.x > collisionBox.x1 &&
+            mousePos.x < collisionBox.x2 &&
+            mousePos.y > collisionBox.y1 &&
+            mousePos.y < collisionBox.y2)
+        return TRUE;
+
+    return FALSE;
+}

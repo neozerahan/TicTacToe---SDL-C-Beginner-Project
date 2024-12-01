@@ -4,7 +4,6 @@
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_pixels.h"
 #include "SDL2/SDL_render.h"
-#include "SDL2/SDL_stdinc.h"
 #include "SDL2/SDL_ttf.h"
 
 
@@ -21,22 +20,6 @@ typedef struct Text
     SDL_Texture *texture;
     char *text;
 }Text;
-
-typedef struct gameData
-{
-    int isRunning;
-    SDL_Event event;
-    int canDraw;
-    struct Player * player01;
-    struct Player * player02;
-    int currentTurn;
-    SDL_Texture *spriteSheet;
-    TTF_Font *font;
-    Text turnText;
-    Text titleText;
-    Text currentTurnText;
-    Uint8 didWin;
-}gameData;
 
 typedef struct CellCollisionBox
 {
@@ -65,6 +48,48 @@ typedef struct Player
     unsigned short int playerNumber;    //Either player 1 or 2...
     SDL_Rect playerTexRect;            //Position of the texture in the sprite sheet...
 }Player;
+
+typedef struct MousePos
+{
+    int x;
+    int y;
+}MousePos;
+
+typedef struct Button
+{
+    SDL_Rect rect;
+    Text text;
+    CellCollisionBox collisionBox;
+}Button;
+
+typedef struct CustomRect {
+    SDL_Rect rect; 
+    SDL_Color color; 
+    int alphaValue;
+    char transState;
+}CustomRect;
+
+typedef struct gameData
+{
+    int isRunning;
+    SDL_Event event;
+    int canDraw;
+    struct Player * player01;
+    struct Player * player02;
+    int currentTurn;
+    SDL_Texture *spriteSheet;
+    SDL_Texture *transitionTexture;
+    TTF_Font *font;
+    Text turnTextP1;
+    Text turnTextP2;
+    Text titleText;
+    Text currentTurnText;
+    Text winTextP1;
+    Text winTextP2;
+    Uint8 didWin;
+    Uint8 gameState;
+    MousePos mousePos;
+}gameData;
 
 #endif
 

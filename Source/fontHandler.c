@@ -29,30 +29,30 @@ void DrawText(Text *text, SDL_Renderer *renderer, TTF_Font *font,unsigned char a
     if(allign & ALLIGN_MID)
     {
         text->rect.x -= textSurface->w * 0.5;
-        printf("Allign Mid!\n");
+        //printf("Allign Mid!\n");
     }
     else if (allign & ALLIGN_RIGHT)
     {
         text->rect.x += textSurface->w;
-        printf("Allign Right!\n");
+        //printf("Allign Right!\n");
     }
     else if ( allign & ALLIGN_LEFT)
     {
         //text->rect.x -= textSurface->w;
         printf("Allign Left!\n");
     }
+
     text->rect.w *= textSurface->w;
     text->rect.h *= textSurface->h;
-    SDL_RenderCopy(renderer, text->texture, 0, &text->rect);
+    //SDL_RenderCopy(renderer, text->texture, 0, &text->rect);
     SDL_FreeSurface(textSurface);
 }
 
 //TODO: Make a seprate function to initialize the font rect so that we don't have to do it
 //everytime we render the font...
-void DrawTitleText(Text *text, SDL_Renderer *renderer, TTF_Font *font, unsigned int x, unsigned int y ,
+void InitializeText(Text *text, SDL_Renderer *renderer, TTF_Font *font, unsigned int x, unsigned int y ,
         char * textInput, unsigned char allign)
 {
-    printf("Drawing Text: %s\n", textInput);
     SDL_Color whiteColor = {255,255,255,255};
     text->color = whiteColor; 
     SDL_Rect textGameTitleRect = {x,y, 1,1};

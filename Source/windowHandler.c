@@ -14,7 +14,7 @@ int CreateWindow(WindowInfo *window)
         printf("SDL initialized!\n");
     }
 
-    window->mainWindow = SDL_CreateWindow("Hello Triangle", window->x , 
+    window->mainWindow = SDL_CreateWindow("TIC TAC TOE", window->x , 
             window->y, window->width, window->height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 
     if(window == NULL)

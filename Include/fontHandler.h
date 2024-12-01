@@ -9,6 +9,6 @@
 void CreateFont(TTF_Font **font);
 void DrawText(Text *text, SDL_Renderer *renderer, TTF_Font *font, unsigned char allign 
         );
-void DrawTitleText(Text *text, SDL_Renderer *renderer, TTF_Font *font, unsigned int x, 
+void InitializeText(Text *text, SDL_Renderer *renderer, TTF_Font *font, unsigned int x, 
         unsigned int y ,char * textInput, unsigned char allign);
 #endif
