@@ -1,6 +1,7 @@
 #include "../Include/windowHandler.h"
 #include "../Include/SDL2/SDL_image.h"
 #include <stdio.h>
+#include <time.h>
 
 int CreateWindow(WindowInfo *window)
 {
@@ -27,6 +28,17 @@ int CreateWindow(WindowInfo *window)
         printf("Window Creation successful!\n");                 
         window->mainRenderer  = SDL_CreateRenderer(window->mainWindow, -1, SDL_RENDERER_ACCELERATED);
     }
+    
+   SDL_Surface *windowIcon =  SDL_LoadBMP("../Resource/Bitmaps/windowIcon.bmp");
+
+   if(windowIcon == NULL) {
+       printf("Unable to load window icon...%s\n", SDL_GetError());
+       return 0;
+   }
+
+   SDL_SetWindowIcon(window->mainWindow, windowIcon);
+
+   SDL_FreeSurface(windowIcon);
 
     return 1;
 }

@@ -8,6 +8,7 @@
 #include "../Include\collision.h"
 #include "../Include\logic.h"
 #include "../Include\fontHandler.h"
+#include "../Include\UI.h"
 
 void ProcessEvents(gameData *currentGameData);
 
@@ -18,18 +19,11 @@ int InitializeBoardDrawData(Renderer *boardDrawData,WindowInfo gameWindow, SDL_T
 
 int InitializeGameData(gameData *currentGameData, SDL_Renderer *gameWindowRenderer, Player *player01, Player *player02);
 
-void InitializeButton(Button *button, char * text, int x, int y, TTF_Font *font, 
-        SDL_Renderer *renderer, int collisionOffsetX, int collisionOffsetY);
-
-void FadeIn(CustomRect *transRect, SDL_Renderer *renderer, SDL_Texture *transTexture,
-        Uint8 NEXT_TRANS_STATE, Uint16 fadeSpeed, SDL_Rect *screenRect);
-
-void FadeOut(CustomRect *transRect, SDL_Renderer *renderer, SDL_Texture *transTexture,
-        Uint8 NEXT_TRANS_STATE, Uint16 fadeSpeed, SDL_Rect *screenRect);
+void InitializeButton(Button *button, char * text, TTF_Font *font, 
+        SDL_Renderer *renderer, SDL_Color fontColor);
 
 int main()
 {
-
     TTF_Init();         
 
     //--------------------------------------------//
@@ -68,58 +62,35 @@ int main()
     InitializeCellData(&cellData, gameWindow, &boardDrawData, currentGameData.spriteSheet);
 
     //--------------------------------------------//
+  
+    SDL_Color white = {COLOR_WHITE};
+    
+    //INITIALIZE BUTTON OBJECTS...
+    Button newGameButton = {0};
+    InitializeButton(&newGameButton, "New Game", currentGameData.font, gameWindow.mainRenderer, 
+             white);
 
-    //INITIALIZE TEXT OBJECTS...
-    InitializeText(&currentGameData.titleText, gameWindow.mainRenderer, currentGameData.font,
-            512/2, 0, "TIC TAC TOE",ALLIGN_MID);
-
-    InitializeText(&currentGameData.currentTurnText,gameWindow.mainRenderer, currentGameData.font,
-            SCREEN_WIDTH * 0.5 - 150, 65, "Current Turn: ", ALLIGN_LEFT);
-
-    InitializeText(&currentGameData.turnTextP1, gameWindow.mainRenderer, currentGameData.font, 
-            currentGameData.currentTurnText.rect.x + 
-            currentGameData.currentTurnText.rect.w + 25 
-            , currentGameData.currentTurnText.rect.y, 
-            "Player 01", ALLIGN_LEFT);
-
-    InitializeText(&currentGameData.turnTextP2, gameWindow.mainRenderer, currentGameData.font, 
-            currentGameData.currentTurnText.rect.x + 
-            currentGameData.currentTurnText.rect.w + 25 
-            , currentGameData.currentTurnText.rect.y, 
-            "Player 02", ALLIGN_LEFT);
-
-    InitializeText(&currentGameData.winTextP1, gameWindow.mainRenderer, currentGameData.font, SCREEN_CENTER,
-               88-25, "Player 1 Wins!!!",ALLIGN_MID);
-
-    InitializeText(&currentGameData.winTextP2, gameWindow.mainRenderer, currentGameData.font, SCREEN_CENTER,
-               88-25, "Player 2 Wins!!!",ALLIGN_MID);
+    Button quitGameButton = {0};
+    InitializeButton(&quitGameButton, "Quit Game", currentGameData.font, 
+            gameWindow.mainRenderer, white);
 
     //--------------------------------------------//
     
-    //INITIALIZE BUTTON OBJECTS...
-
-    Button newGameButton = {0};
-    InitializeButton(&newGameButton, "New Game", 512/2, currentGameData.titleText.rect.h + 100, 
-            currentGameData.font, gameWindow.mainRenderer, 140, 100);
-
-    Button quitGameButton = {0};
-    InitializeButton(&quitGameButton, "Quit Game", 512/2, newGameButton.rect.h + 
-            newGameButton.rect.y + 25, currentGameData.font, gameWindow.mainRenderer, 140, 
-            100);
-
-    //--------------------------------------------//
-   
+    //Used for transitioning screen...
     CustomRect transRect = {
         {0,0,800,600},
         {0,0,0,255},
         0,
     };
 
+    //TARGET FPS SET TO 60 in globals.h....
+    int desiredFPSInMS = 1000/TARGET_FPS;
+
     //--------------------------------------------//
     //GAME LOOP...
     while(currentGameData.isRunning)
     {
-
+        int lastFrameTime = SDL_GetTicks();
         //MENU STATE...
         if(currentGameData.gameState == GAME_STATE_MENU)
         {
@@ -147,22 +118,40 @@ int main()
             }
 
             //Rendering in MAIN MENU STATE...
-            if(transRect.transState == TRANS_STATE_NONE)
+            if(transRect.transState == TRANS_STATE_NONE || transRect.transState == 
+                    TRANS_STATE_OUT_MENU)
             {
+                SDL_SetRenderDrawColor(gameWindow.mainRenderer , 128,128,128,255);
                 SDL_RenderClear(gameWindow.mainRenderer);
-
                 SDL_Rect menuRenderRect = {140, 100, 512, 512};
 
                 SDL_RenderSetViewport(gameWindow.mainRenderer, &menuRenderRect);
 
-                SDL_RenderCopy(gameWindow.mainRenderer, currentGameData.titleText.texture,0, 
-                        &currentGameData.titleText.rect);
+                ShowText(&currentGameData.titleText, gameWindow.mainRenderer, 512 * 0.5, 0, 
+                        ALLIGN_MID);
 
-                SDL_RenderCopy(gameWindow.mainRenderer, newGameButton.text.texture, 0, 
-                        &newGameButton.text.rect);
+                DrawButton(&newGameButton, gameWindow.mainRenderer, gameWindow.mainWindow,
+                        512 * 0.5,currentGameData.titleText.rect.h + 100,140 ,100,ALLIGN_MID, FALSE);
 
-                SDL_RenderCopy(gameWindow.mainRenderer, quitGameButton.text.texture, 0, 
-                        &quitGameButton.text.rect);
+                DrawButton(&quitGameButton, gameWindow.mainRenderer, gameWindow.mainWindow, 
+                        512 * 0.5, newGameButton.rect.h + newGameButton.rect.y, 140,100,
+                        ALLIGN_MID, FALSE);
+            }
+
+            if(transRect.transState == TRANS_STATE_OUT_MENU) {
+                FadeOut(&transRect, gameWindow.mainRenderer, currentGameData.transitionTexture, 
+                        TRANS_STATE_FINISH_MENU, 25, gameWindow.rect);
+            }
+            else if( transRect.transState == TRANS_STATE_FINISH_MENU)
+            {
+                transRect.transState = TRANS_STATE_NONE;
+
+                currentGameData.gameState = GAME_STATE_MENU;
+
+                for(int i = 0; i < ROWS*COLUMNS; i++)
+                    cellData.cellCollection[i].playerNumber = 0;
+
+                currentGameData.didWin = 0;
             }
 
             //ON FADE IN...
@@ -175,6 +164,7 @@ int main()
             //ON FADE OUT...
             else if (transRect.transState == TRANS_STATE_OUT)
             {
+                SDL_SetRenderDrawColor(gameWindow.mainRenderer , 128,128,128,255);
                 SDL_RenderClear(gameWindow.mainRenderer);
 
                 RenderScreen(gameWindow, currentGameData, &cellData, &boardDrawData);
@@ -186,6 +176,7 @@ int main()
             //ON FADE TRANSITION COMPLETE...
             else if(transRect.transState == TRANS_STATE_FINISH)
             {
+                printf("In IN_TRANS_STATE_FINISH\n"); 
                 currentGameData.gameState = GAME_STATE_IN_GAME;
                 transRect.transState = TRANS_STATE_NONE;
 
@@ -208,19 +199,59 @@ int main()
                 if(currentGameData.isRunning == FALSE) break;
             }
 
-            //GAMEPLAY LOGIC...
-            if(logic(&currentGameData, gameWindow, &cellData))
+            logic(&currentGameData, gameWindow, &cellData);
+
+            //RENDERING...
+            SDL_SetRenderDrawColor(gameWindow.mainRenderer , 128,128,128,255);
+            SDL_RenderClear(gameWindow.mainRenderer);
+
+            RenderScreen(gameWindow, currentGameData, &cellData, &boardDrawData);
+
+            //If player 1 or player 2 wins the game...
+            if(currentGameData.didWin == PLAYER_1_TURN || currentGameData.didWin == PLAYER_2_TURN)
             {
-                //RENDERING...
-                SDL_RenderClear(gameWindow.mainRenderer);
+                DrawButton(&newGameButton, gameWindow.mainRenderer, gameWindow.mainWindow, 
+                        SCREEN_WIDTH * 0.25, 500 + 25 , 0, 0, FALSE, FALSE);
 
-                RenderScreen(gameWindow, currentGameData, &cellData, &boardDrawData);
+                DrawButton(&quitGameButton, gameWindow.mainRenderer, gameWindow.mainWindow, 
+                        SCREEN_WIDTH * 0.75, 500 + 25 , 0, 0, ALLIGN_RIGHT, FALSE);
 
-                SDL_RenderPresent(gameWindow.mainRenderer);
+                if(CheckCollision(newGameButton.collisionBox, currentGameData.mousePos))
+                {
+                    transRect.transState = TRANS_STATE_IN;
+                    currentGameData.mousePos.x = 0;
+                    currentGameData.mousePos.y = 0;
+                }
+
+                if(CheckCollision(quitGameButton.collisionBox, currentGameData.mousePos))
+                {
+                    currentGameData.isRunning = FALSE;
+                }
             }
+
+            //Fade in transition if new game button is pressed...
+            if(transRect.transState == TRANS_STATE_IN)
+            {
+                FadeIn(&transRect, gameWindow.mainRenderer, currentGameData.transitionTexture, 
+                        TRANS_STATE_OUT_MENU, 25, gameWindow.rect);
+            }
+
+            //Go to Menu once the transition fade-in is complete...
+            if(transRect.transState == TRANS_STATE_OUT_MENU) 
+                currentGameData.gameState = GAME_STATE_MENU;
+
+            SDL_RenderPresent(gameWindow.mainRenderer);
         }
 
-        SDL_Delay(16);
+        int currentFrameTime = SDL_GetTicks();
+
+        int deltaTime = currentFrameTime - lastFrameTime;
+
+        if(deltaTime < desiredFPSInMS)
+        {
+            deltaTime = desiredFPSInMS - deltaTime;
+            SDL_Delay(deltaTime);
+        }
     }
 
     //FREE RESOURCE...
@@ -266,9 +297,11 @@ void ProcessEvents(gameData *currentGameData)
 
         currentGameData->mousePos.x = currentGameData->event.motion.x;
         currentGameData->mousePos.y = currentGameData->event.motion.y;
+        printf("Mouse Pos: %d\n", currentGameData->mousePos.x);
 
         if(currentGameData->gameState == GAME_STATE_MENU) return;
 
+        if(currentGameData->didWin > 0) return;
         //if it is left-mouse button..
         if(currentGameData->event.button.button == SDL_BUTTON_LEFT)
         { 
@@ -352,15 +385,33 @@ int InitializeGameData(gameData *currentGameData, SDL_Renderer *gameWindowRender
         printf("Unable to initialize the font...%s\n", SDL_GetError());
         return 0;
     }
-    currentGameData->currentTurnText.text = "Current Turn:";
-    currentGameData->titleText.text = "TIC TAC TOE";
+    SDL_Color white = {COLOR_WHITE};
+    
+    CreateText(&currentGameData->titleText, "TIC TAC TOE", gameWindowRenderer, 
+            currentGameData->font, white);  
+
+    CreateText(&currentGameData->currentTurnText, "Current Turn:", gameWindowRenderer,
+            currentGameData->font, white);
+
+    CreateText(&currentGameData->turnTextP1, "Player 1", gameWindowRenderer, 
+            currentGameData->font, white); 
+
+    CreateText(&currentGameData->turnTextP2, "Player 2", gameWindowRenderer, 
+            currentGameData->font, white); 
+
+    CreateText(&currentGameData->winTextP1, "Player 1 Wins!!!", gameWindowRenderer, 
+            currentGameData->font, white); 
+
+    CreateText(&currentGameData->winTextP2, "Player 2 Wins!!!", gameWindowRenderer, 
+            currentGameData->font, white); 
+    
     currentGameData->gameState = GAME_STATE_MENU;
 
     return 1;
 }
 
-void InitializeButton(Button *button, char * text, int x, int y, TTF_Font *font, 
-        SDL_Renderer *renderer, int collisionOffsetX, int collisionOffsetY)
+void InitializeButton(Button *button, char * text,TTF_Font *font, 
+        SDL_Renderer *renderer, SDL_Color fontColor)
 {
     if(renderer == NULL)
     {
@@ -374,59 +425,14 @@ void InitializeButton(Button *button, char * text, int x, int y, TTF_Font *font,
         return;
     }
 
-    InitializeText(&button->text, renderer, font, x, y, text, ALLIGN_MID);     
+    //InitializeText(&button->text, renderer, font, x, y, text, ALLIGN_MID);     
 
-    button->rect.h = button->text.rect.h;
-    button->rect.w = button->text.rect.w;
-    button->rect.x = button->text.rect.x;
-    button->rect.y = button->text.rect.y;
+    CreateText(&button->text, text, renderer, font, fontColor);
 
-    button->collisionBox.x1 = button->rect.x + collisionOffsetX;
-    button->collisionBox.x2 = button->rect.x + button->rect.w + collisionOffsetX;
-    button->collisionBox.y1 = button->rect.y + collisionOffsetY;
-    button->collisionBox.y2 = button->rect.y + button->rect.h + collisionOffsetY;  
-}
+    button->rect = button->text.rect;
 
-void FadeIn(CustomRect *transRect, SDL_Renderer *renderer, SDL_Texture *transTexture,
-        Uint8 NEXT_TRANS_STATE, Uint16 fadeSpeed, SDL_Rect *screenRect)
-{
-    SDL_RenderSetViewport(renderer, screenRect);
-    SDL_SetTextureBlendMode(transTexture, SDL_BLENDMODE_BLEND);
-    if(transRect->alphaValue <= 255)
-    {
-        SDL_SetTextureAlphaMod(transTexture, 
-                transRect->alphaValue);
-
-        SDL_RenderCopy(renderer, transTexture, 
-                NULL, NULL);
-
-        transRect->alphaValue += fadeSpeed;
-        if(transRect->alphaValue >= 255) 
-        {
-            transRect->transState = NEXT_TRANS_STATE;
-            transRect->alphaValue = 255;
-        }
-    }
-}
-
-void FadeOut(CustomRect *transRect, SDL_Renderer *renderer, SDL_Texture *transTexture,
-        Uint8 NEXT_TRANS_STATE, Uint16 fadeSpeed, SDL_Rect *screenRect)
-{
-    SDL_RenderSetViewport(renderer, screenRect); 
-    SDL_SetTextureBlendMode(transTexture, SDL_BLENDMODE_BLEND);
-    if(transRect->alphaValue >= 0)
-    {
-        SDL_SetTextureAlphaMod(transTexture, 
-                transRect->alphaValue);
-
-        SDL_RenderCopy(renderer, transTexture, 
-                NULL, NULL);
-
-        transRect->alphaValue -= fadeSpeed;
-        if(transRect->alphaValue <= 0) 
-        {
-            transRect->transState = NEXT_TRANS_STATE;
-            transRect->alphaValue = 0;
-        }
-    }
+    button->collisionBox.x1 = button->rect.x; 
+    button->collisionBox.x2 = button->rect.x + button->rect.w;
+    button->collisionBox.y1 = button->rect.y;
+    button->collisionBox.y2 = button->rect.y + button->rect.h;  
 }

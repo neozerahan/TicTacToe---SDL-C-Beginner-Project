@@ -1,4 +1,5 @@
 #include "..\Include\fontHandler.h"
+#include <stdint.h>
 
 void CreateFont(TTF_Font **font)
 {
@@ -10,53 +11,53 @@ void CreateFont(TTF_Font **font)
     }
 }
 
-void DrawText(Text *text, SDL_Renderer *renderer, TTF_Font *font,unsigned char allign)
+int CreateText(Text *textObj, char *text, SDL_Renderer *renderer, TTF_Font *font, 
+        SDL_Color color)
 {
-    SDL_Surface *textSurface = TTF_RenderText_Blended(font,text->text, text->color); 
-    if(textSurface == NULL)
+    //Surface creation...
+    SDL_Surface *textSurface = TTF_RenderText_Blended(font, text, color); 
+    if(textSurface == NULL) 
     {
-        printf("Unable to initialize the text surface...%s\n", SDL_GetError());
-        return; 
+        printf("Unable to create surface during font creation\n");
+        return 0;
     }
 
-    text->texture = SDL_CreateTextureFromSurface(renderer, textSurface);
-    if(text->texture == NULL)
+    //Font texture... 
+    textObj->texture = SDL_CreateTextureFromSurface(renderer, textSurface); 
+    if(textObj->texture == NULL)
     {
-        printf("Unable to initialize the text texture...%s\n", SDL_GetError());
-        return; 
+        printf("Unable to create texture during font creation\n");
+        return 0;
     }
 
-    if(allign & ALLIGN_MID)
-    {
-        text->rect.x -= textSurface->w * 0.5;
-        //printf("Allign Mid!\n");
-    }
-    else if (allign & ALLIGN_RIGHT)
-    {
-        text->rect.x += textSurface->w;
-        //printf("Allign Right!\n");
-    }
-    else if ( allign & ALLIGN_LEFT)
-    {
-        //text->rect.x -= textSurface->w;
-        printf("Allign Left!\n");
-    }
+    //Initialize size...
+    textObj->rect.h = textSurface->h;
+    textObj->rect.w = textSurface->w;
+    textObj->rect.x = 0;
+    textObj->rect.y = 0;
 
-    text->rect.w *= textSurface->w;
-    text->rect.h *= textSurface->h;
-    //SDL_RenderCopy(renderer, text->texture, 0, &text->rect);
-    SDL_FreeSurface(textSurface);
+    printf("Initialized Font successfully: %s\n", text);
+    return 1;
 }
 
-//TODO: Make a seprate function to initialize the font rect so that we don't have to do it
-//everytime we render the font...
-void InitializeText(Text *text, SDL_Renderer *renderer, TTF_Font *font, unsigned int x, unsigned int y ,
-        char * textInput, unsigned char allign)
+int ShowText(Text *textObj, SDL_Renderer *renderer, int x, int y, uint8_t allign)
 {
-    SDL_Color whiteColor = {255,255,255,255};
-    text->color = whiteColor; 
-    SDL_Rect textGameTitleRect = {x,y, 1,1};
-    text->rect = textGameTitleRect;
-    text->text = textInput;
-    DrawText(text, renderer, font, allign);
+
+    if(renderer == NULL)
+    {
+        printf("Cannot draw text. Renderer is NULL!\n");
+        return 0;
+    }
+
+    if(allign == 0)
+        textObj->rect.x = x;
+    else if(allign == ALLIGN_MID) 
+        textObj->rect.x = x - textObj->rect.w * 0.5;
+    else if(allign == ALLIGN_RIGHT)
+        textObj->rect.x = x - textObj->rect.w;
+
+    textObj->rect.y = y;
+
+    SDL_RenderCopy(renderer, textObj->texture, NULL, &textObj->rect);
+    return 1;
 }

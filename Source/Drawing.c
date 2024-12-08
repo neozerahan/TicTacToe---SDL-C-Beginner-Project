@@ -52,12 +52,10 @@ void RenderScreen(WindowInfo gameWindow,
         SDL_Rect playerRect = {0};
         if(cellData->cellCollection[i].playerNumber == PLAYER_1_TURN)
         {
-            printf("Drawing player 1!\n");
             playerRect = currentGameData.player01->playerTexRect;  
         }
         else if(cellData->cellCollection[i].playerNumber == PLAYER_2_TURN)
         {
-            printf("Drawing player 2!\n");
             playerRect = currentGameData.player02->playerTexRect;  
         }
         SDL_RenderCopy(gameWindow.mainRenderer, currentGameData.spriteSheet, 
@@ -72,15 +70,14 @@ void RenderScreen(WindowInfo gameWindow,
         
         if(currentGameData.didWin == PLAYER_1_TURN)
         {
-            SDL_RenderCopy(gameWindow.mainRenderer, currentGameData.winTextP1.texture, 0, 
-                    &currentGameData.winTextP1.rect);
+            ShowText(&currentGameData.winTextP1, gameWindow.mainRenderer, 
+                    SCREEN_WIDTH * 0.5, 100 - currentGameData.winTextP1.rect.h,ALLIGN_MID);
         }
         else if( currentGameData.didWin == PLAYER_2_TURN)
         {
-            SDL_RenderCopy(gameWindow.mainRenderer, currentGameData.winTextP2.texture, 0, 
-                    &currentGameData.winTextP2.rect);
+           ShowText(&currentGameData.winTextP2, gameWindow.mainRenderer, 
+                    SCREEN_WIDTH * 0.5, 100 - currentGameData.winTextP2.rect.h, ALLIGN_MID);
         }
-
    }
 }
 
@@ -89,12 +86,8 @@ void RenderText(gameData currentGameData, SDL_Renderer *textRenderer, SDL_Rect *
 {
     SDL_RenderSetViewport(textRenderer, textRendererRect);
 
-    //TITLE TEXT...
-    //Center the text...
-    currentGameData.titleText.rect.x = SCREEN_WIDTH * 0.5 - currentGameData.titleText.rect.w * 0.5;
-    
-    SDL_RenderCopy(textRenderer, currentGameData.titleText.texture, 0, 
-            &currentGameData.titleText.rect);
+   ShowText(&currentGameData.titleText, textRenderer, SCREEN_WIDTH * 0.5, 
+            currentGameData.titleText.rect.y, ALLIGN_MID);
 
     //Render the CURRENT PLAYER TEXT only if player does not win...
     if(currentGameData.didWin == FALSE)
@@ -102,8 +95,9 @@ void RenderText(gameData currentGameData, SDL_Renderer *textRenderer, SDL_Rect *
         currentGameData.currentTurnText.rect.x = SCREEN_WIDTH * 0.5 - 150;
         currentGameData.currentTurnText.rect.y = 65;
 
-        SDL_RenderCopy(textRenderer, currentGameData.currentTurnText.texture, 0, 
-            &currentGameData.currentTurnText.rect);
+            ShowText(&currentGameData.currentTurnText, textRenderer, 
+                        currentGameData.currentTurnText.rect.x, 
+                        currentGameData.currentTurnText.rect.y, 0);
 
         if(currentGameData.currentTurn == PLAYER_1_TURN)
         {
@@ -112,8 +106,9 @@ void RenderText(gameData currentGameData, SDL_Renderer *textRenderer, SDL_Rect *
 
             currentGameData.turnTextP1.rect.y = currentGameData.currentTurnText.rect.y; 
 
-            SDL_RenderCopy(textRenderer, currentGameData.turnTextP1.texture, 0, 
-                    &currentGameData.turnTextP1.rect);
+            ShowText(&currentGameData.turnTextP1, textRenderer, currentGameData.turnTextP1.rect.x,
+                    currentGameData.turnTextP1.rect.y, 0);
+
         }
         else
         {
@@ -122,23 +117,29 @@ void RenderText(gameData currentGameData, SDL_Renderer *textRenderer, SDL_Rect *
 
             currentGameData.turnTextP2.rect.y = currentGameData.currentTurnText.rect.y; 
 
-            SDL_RenderCopy(textRenderer, currentGameData.turnTextP2.texture, 0, 
-                    &currentGameData.turnTextP2.rect);
+            ShowText(&currentGameData.turnTextP2, textRenderer, currentGameData.turnTextP2.rect.x,
+                    currentGameData.turnTextP2.rect.y, 0);
         }
 
         //Draws player shape besides player turn...
         //TODO: Make this into a function...
-        SDL_Rect shapeRect = {currentGameData.turnTextP1.rect.x + 
-            currentGameData.turnTextP1.rect.w,currentGameData.turnTextP1.rect.y 
-                ,38,38};
+      
 
         if(currentGameData.currentTurn == PLAYER_1_TURN)
         {
+            SDL_Rect shapeRect = {currentGameData.turnTextP1.rect.x + 
+            currentGameData.turnTextP1.rect.w,currentGameData.turnTextP1.rect.y 
+                ,38,38};
+
             SDL_RenderCopy(textRenderer, currentGameData.spriteSheet, 
                     &currentGameData.player01->playerTexRect, &shapeRect); 
         }
         else if( currentGameData.currentTurn == PLAYER_2_TURN)
         {
+            SDL_Rect shapeRect = {currentGameData.turnTextP2.rect.x + 
+            currentGameData.turnTextP2.rect.w,currentGameData.turnTextP2.rect.y 
+                ,38,38};
+
             SDL_RenderCopy(textRenderer, currentGameData.spriteSheet, 
                     &currentGameData.player02->playerTexRect, &shapeRect); 
         }
