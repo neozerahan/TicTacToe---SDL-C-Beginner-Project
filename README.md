@@ -7,4 +7,4 @@ Although this is a beginner level project, for me, a lot of concepts were brand 
 such as Break-out or Pong.
 
 Screenshots
-
+https://github.com/neozerahan/TicTacToe/blob/main/Others/TicTacToe.gif
