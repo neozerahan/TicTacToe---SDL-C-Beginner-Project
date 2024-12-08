@@ -131,7 +131,7 @@ int main()
                         ALLIGN_MID);
 
                 DrawButton(&newGameButton, gameWindow.mainRenderer, gameWindow.mainWindow,
-                        512 * 0.5,currentGameData.titleText.rect.h + 100,140 ,100,ALLIGN_MID, FALSE);
+                        512 * 0.5,currentGameData.titleText.rect.h + 150,140 ,100,ALLIGN_MID, FALSE);
 
                 DrawButton(&quitGameButton, gameWindow.mainRenderer, gameWindow.mainWindow, 
                         512 * 0.5, newGameButton.rect.h + newGameButton.rect.y, 140,100,
@@ -387,7 +387,7 @@ int InitializeGameData(gameData *currentGameData, SDL_Renderer *gameWindowRender
     }
     SDL_Color white = {COLOR_WHITE};
     
-    CreateText(&currentGameData->titleText, "TIC TAC TOE", gameWindowRenderer, 
+    CreateText(&currentGameData->titleText, "-- TIC TAC TOE --", gameWindowRenderer, 
             currentGameData->font, white);  
 
     CreateText(&currentGameData->currentTurnText, "Current Turn:", gameWindowRenderer,

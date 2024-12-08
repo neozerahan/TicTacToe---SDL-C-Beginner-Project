@@ -16,7 +16,7 @@ int CreateWindow(WindowInfo *window)
     }
 
     window->mainWindow = SDL_CreateWindow("TIC TAC TOE", window->x , 
-            window->y, window->width, window->height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+            window->y, window->width, window->height, SDL_WINDOW_SHOWN);
 
     if(window == NULL)
     {

@@ -21,17 +21,27 @@ set exe=-o %projectPath%\Bin\%executableName%
 REM INCLUDES... 
 set includes=-I %projectPath%\Include
 
+REM SET TERMINAL DEBUG WINDOW...
+set terminalWindow=
+
 echo.
 if "%1"=="b" (
     echo BUILD MODE
     set buildFlags=-g
-    ) else (
-    echo NORMAL MODE
+    ) 
+
+if "%1"=="f" (
+    echo FINAL MODE
+    set terminalWindow=-mwindows
+    ) 
+
+if [%1]==[] (
+    echo DEV MODE
     )
 echo.
 
 REM COMPILE... 
-gcc %buildFlags% %exe% %source% %libs% %includes%       
+gcc %buildFlags% %exe% %source% %libs% %includes% %terminalWindow%       
    
 echo.
 if %ERRORLEVEL%==1 (
