@@ -7,5 +7,5 @@ Although this is a beginner level project, for me, a lot of concepts were brand 
 such as Break-out or Pong.
 
 Screenshots
-https://github.com/user-attachments/assets/66001004-521f-4175-904f-8e9eecc3386d
+<iframe src="https://giphy.com/embed/jPVqCtO9FTRWfxBPRy" width="480" height="360" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/jPVqCtO9FTRWfxBPRy">via GIPHY</a></p>
 
