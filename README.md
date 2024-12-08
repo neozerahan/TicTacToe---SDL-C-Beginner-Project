@@ -1,4 +1,5 @@
 TIC TAC TOE is a 2D game that i developed to learn C and SDL.
+
 ![](https://github.com/neozerahan/TicTacToe/blob/main/Others/TicTacToe.gif)
 
 I am new to SDL and this project enabled me to get my hands dirty on rendering graphics, font and other fundamental concepts such as frame rate, menu system. 
