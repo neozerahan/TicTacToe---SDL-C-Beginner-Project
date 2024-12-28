@@ -78,6 +78,11 @@ void RenderScreen(WindowInfo gameWindow,
            ShowText(&currentGameData.winTextP2, gameWindow.mainRenderer, 
                     SCREEN_WIDTH * 0.5, 100 - currentGameData.winTextP2.rect.h, ALLIGN_MID);
         }
+        else if( currentGameData.didWin == GAME_IS_DRAW)
+        {
+           ShowText(&currentGameData.drawText, gameWindow.mainRenderer, 
+                    SCREEN_WIDTH * 0.5, 100 - currentGameData.drawText.rect.h, ALLIGN_MID);
+        }
    }
 }
 

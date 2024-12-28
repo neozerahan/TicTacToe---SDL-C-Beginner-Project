@@ -117,7 +117,7 @@ int main()
                 }
             }
 
-            //Rendering in MAIN MENU STATE...
+            //RENDERING MAIN MENU...
             if(transRect.transState == TRANS_STATE_NONE || transRect.transState == 
                     TRANS_STATE_OUT_MENU)
             {
@@ -137,24 +137,30 @@ int main()
                         512 * 0.5, newGameButton.rect.h + newGameButton.rect.y, 140,100,
                         ALLIGN_MID, FALSE);
             }
+            
 
+            //FADE-OUT MAIN-MENU...
             if(transRect.transState == TRANS_STATE_OUT_MENU) {
                 FadeOut(&transRect, gameWindow.mainRenderer, currentGameData.transitionTexture, 
                         TRANS_STATE_FINISH_MENU, 25, gameWindow.rect);
             }
+
+            //RESET DATA ONCE THE MAIN-MENU HAS FADED-OUT...
             else if( transRect.transState == TRANS_STATE_FINISH_MENU)
             {
                 transRect.transState = TRANS_STATE_NONE;
-
                 currentGameData.gameState = GAME_STATE_MENU;
 
                 for(int i = 0; i < ROWS*COLUMNS; i++)
                     cellData.cellCollection[i].playerNumber = 0;
 
+                //RESET THE DATA WHEN RESTARTING/PRESSING THE NEW-GAME BUTTON...
                 currentGameData.didWin = 0;
+                currentGameData.player01->turnCount = 0;
+                currentGameData.player02->turnCount = 0;
             }
 
-            //ON FADE IN...
+            //FADE IN TO IN-GAME...
             if(transRect.transState == TRANS_STATE_IN)
             { 
                 FadeIn(&transRect, gameWindow.mainRenderer, 
@@ -176,7 +182,6 @@ int main()
             //ON FADE TRANSITION COMPLETE...
             else if(transRect.transState == TRANS_STATE_FINISH)
             {
-                printf("In IN_TRANS_STATE_FINISH\n"); 
                 currentGameData.gameState = GAME_STATE_IN_GAME;
                 transRect.transState = TRANS_STATE_NONE;
 
@@ -207,8 +212,9 @@ int main()
 
             RenderScreen(gameWindow, currentGameData, &cellData, &boardDrawData);
 
-            //If player 1 or player 2 wins the game...
-            if(currentGameData.didWin == PLAYER_1_TURN || currentGameData.didWin == PLAYER_2_TURN)
+            //IF PLAYER 1 OR PLAYER 2 WINS THE GAME OR IF IT IS A DRAW...
+            if(currentGameData.didWin == PLAYER_1_TURN || currentGameData.didWin == PLAYER_2_TURN
+                    || currentGameData.didWin == GAME_IS_DRAW)
             {
                 DrawButton(&newGameButton, gameWindow.mainRenderer, gameWindow.mainWindow, 
                         SCREEN_WIDTH * 0.25, 500 + 25 , 0, 0, FALSE, FALSE);
@@ -216,27 +222,29 @@ int main()
                 DrawButton(&quitGameButton, gameWindow.mainRenderer, gameWindow.mainWindow, 
                         SCREEN_WIDTH * 0.75, 500 + 25 , 0, 0, ALLIGN_RIGHT, FALSE);
 
+                //IF NEW GAME BUTTON IS PRESSED...
                 if(CheckCollision(newGameButton.collisionBox, currentGameData.mousePos))
                 {
                     transRect.transState = TRANS_STATE_IN;
                     currentGameData.mousePos.x = 0;
                     currentGameData.mousePos.y = 0;
                 }
-
+                
+                //IF QUIT GAME BUTTON IS PRESSED...
                 if(CheckCollision(quitGameButton.collisionBox, currentGameData.mousePos))
                 {
                     currentGameData.isRunning = FALSE;
                 }
             }
 
-            //Fade in transition if new game button is pressed...
+            //FADE IN TRANSITION IF NEW GAME BUTTON IS PRESSED...
             if(transRect.transState == TRANS_STATE_IN)
             {
                 FadeIn(&transRect, gameWindow.mainRenderer, currentGameData.transitionTexture, 
                         TRANS_STATE_OUT_MENU, 25, gameWindow.rect);
             }
 
-            //Go to Menu once the transition fade-in is complete...
+            //GO TO MENU ONCE THE TRANSITION FADE-IN IS COMPLETE...
             if(transRect.transState == TRANS_STATE_OUT_MENU) 
                 currentGameData.gameState = GAME_STATE_MENU;
 
@@ -405,6 +413,9 @@ int InitializeGameData(gameData *currentGameData, SDL_Renderer *gameWindowRender
     CreateText(&currentGameData->winTextP2, "Player 2 Wins!!!", gameWindowRenderer, 
             currentGameData->font, white); 
     
+    CreateText(&currentGameData->drawText, "It is a Draw!!!", gameWindowRenderer, 
+            currentGameData->font, white); 
+ 
     currentGameData->gameState = GAME_STATE_MENU;
 
     return 1;

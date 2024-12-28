@@ -28,6 +28,7 @@
 
 #define PLAYER_1_TURN 1
 #define PLAYER_2_TURN 2
+#define GAME_IS_DRAW 3
 #define SCREEN_WIDTH   800
 #define SCREEN_HEIGHT  600 
 #define SCREEN_CENTER SCREEN_WIDTH * 0.5

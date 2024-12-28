@@ -70,6 +70,17 @@ void ProcessPlayerTurn(WindowInfo gameWindow, gameData *currentGameData, Player 
            printf("Player %d WINS!\n", currentPlayerNumber);
        }
     }
+
+    //Draw if current players turncount has placed more than 6 shapes
+    //and has not yet won, then it is DRAW...
+    if(player->turnCount >= 5)
+    {
+        if(currentGameData->didWin == 0)
+        {
+            currentGameData->didWin = GAME_IS_DRAW;
+            printf("GAME IS A DRAW!!!");
+        }
+    }
 }
 
 uint8_t CheckWin(int selectedCell, Cell *cellCollection, uint8_t currentPlayerNumber)

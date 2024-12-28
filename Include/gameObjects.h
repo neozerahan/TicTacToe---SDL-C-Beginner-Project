@@ -86,6 +86,7 @@ typedef struct gameData
     Text currentTurnText;
     Text winTextP1;
     Text winTextP2;
+    Text drawText;
     Uint8 didWin;
     Uint8 gameState;
     MousePos mousePos;
